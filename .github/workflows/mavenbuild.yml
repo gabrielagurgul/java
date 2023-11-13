@@ -42,22 +42,22 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      - name: Calculate semantic version
-        # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
-        run: |
-          tag=${{ github.ref_name }}
-          tag="${tag#v}"
-          if [[ ! $tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Invalid tag format. It should be in the format 'vX.Y.Z'."
-            exit 1
-          fi
-          echo "Semantic version: $tag"
-          echo "SEMANTIC_VERSION=$tag" >> $GITHUB_ENV
+      # - name: Calculate semantic version
+      #   # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+      #   run: |
+      #     tag=${{ github.ref_name }}
+      #     tag="${tag#v}"
+      #     if [[ ! $tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      #       echo "Invalid tag format. It should be in the format 'vX.Y.Z'."
+      #       exit 1
+      #     fi
+      #     echo "Semantic version: $tag"
+          # echo "SEMANTIC_VERSION=$tag" >> $GITHUB_ENV
 
       - name: Publish package
         # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
         run: |
-          mvn versions:set -DnewVersion=$SEMANTIC_VERSION
+          # mvn versions:set -DnewVersion=$SEMANTIC_VERSION
           mvn --batch-mode deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

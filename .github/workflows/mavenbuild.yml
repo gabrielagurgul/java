@@ -43,7 +43,7 @@ jobs:
         run: mvn clean install
 
       - name: Calculate semantic version
-        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
         run: |
           tag=${{ github.ref_name }}
           tag="${tag#v}"
@@ -55,7 +55,7 @@ jobs:
           echo "SEMANTIC_VERSION=$tag" >> $GITHUB_ENV
 
       - name: Publish package
-        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        # if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
         run: |
           mvn versions:set -DnewVersion=$SEMANTIC_VERSION
           mvn --batch-mode deploy

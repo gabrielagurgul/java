@@ -1,0 +1,51 @@
+plugins {
+	id 'org.springframework.boot' version '3.1.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'java'
+	id "org.sonarqube" version "4.4.1.3373"
+	id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sonar {
+    properties {
+	property "sonar.projectKey", "softwareone-software-and-cloud-services_javagradle-template"
+    	property "sonar.organization", "softwareone-software-and-cloud-services"
+    	property "sonar.host.url", "https://sonarcloud.io"
+        property("sonar.sources", "src/main")
+        property "sonar.tests", "src/test"
+    }
+}
+
+group = 'software-one'
+sourceCompatibility = '17'
+
+publishing {
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = "https://maven.pkg.github.com/software-one/swo-cicd-template-java-springboot-gradle"
+      credentials {
+        username = System.getenv("GITHUB_ACTOR")
+        password = System.getenv("GITHUB_TOKEN")
+      }
+    }
+  }
+}
+
+dependencies {
+	// tag::actuator[]
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	// end::actuator[]
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	// tag::tests[]
+	testImplementation('org.springframework.boot:spring-boot-starter-test')
+	// end::tests[]
+}
+
+test {
+	useJUnitPlatform()
+}

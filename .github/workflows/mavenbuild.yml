@@ -1,0 +1,64 @@
+name: Maven Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags: 
+      - 'v[0-9].*' #match tags starting with v and an digit after that
+    paths:
+      - '.github/workflows/MavenBuild.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '.github/workflows/MavenBuild.yml'
+
+jobs:
+  build:
+    name: Build Main Branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          
+      - name: Grant execute permission to Gradle wrapper
+        run: chmod +x ./mvnw
+
+      - name: Analyze with SonarCloud
+        run: ./mvnw -B verify sonar:sonar -Dsonar.projectKey=softwareone-software-and-cloud-services_javagradle-template -Dsonar.organization=softwareone-software-and-cloud-services -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Build with Maven
+        run: ./mvnw --batch-mode clean package
+
+      - name: Calculate semantic version
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag=${{ github.ref_name }}
+          tag="${tag#v}"
+          if [[ ! $tag =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Invalid tag format. It should be in the format 'vX.Y.Z'."
+            exit 1
+          fi
+          echo "Semantic version: $tag"
+          echo "SEMANTIC_VERSION=$tag" >> $GITHUB_ENV
+
+      - name: Publish package
+        if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          mvn versions:set -DnewVersion=$SEMANTIC_VERSION
+          mvn --batch-mode deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEMANTIC_VERSION: ${{ env.SEMANTIC_VERSION }}

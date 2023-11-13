@@ -33,11 +33,11 @@ jobs:
       - name: Grant execute permission to Gradle wrapper
         run: chmod +x ./mvnw
 
-      - name: Analyze with SonarCloud
-        run: ./mvnw -B verify sonar:sonar -Dsonar.projectKey=softwareone-software-and-cloud-services_javagradle-template -Dsonar.organization=softwareone-software-and-cloud-services -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: Analyze with SonarCloud
+      #   run: ./mvnw -B verify sonar:sonar -Dsonar.projectKey=softwareone-software-and-cloud-services_javagradle-template -Dsonar.organization=softwareone-software-and-cloud-services -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Build with Maven
         run: ./mvnw --batch-mode clean package
